@@ -3,7 +3,7 @@ import * as Lambda from "@aws-sdk/client-lambda"
 import * as S3 from "@aws-sdk/client-s3"
 import * as Text from "@dashkite/joy/text"
 import * as Time from "@dashkite/joy/time"
-import { lift } from "./helpers"
+import { lift, log } from "./helpers"
 
 AWS =
   Lambda: lift Lambda
@@ -53,12 +53,11 @@ getLambdaVersion = (name, version) ->
   undefined
 
 getLatestLambda = (name) ->
-  console.log "NAME", name
   { Versions }  = await AWS.Lambda.listVersionsByFunction FunctionName: name
   result = undefined
   max = 0
   for current in Versions
-    console.log "Version:", current.Version
+    log "lambda", name, "version: #{ current.Version }"
     if current.Version != "$LATEST"
       version = Text.parseNumber current.Version
       if version >= max

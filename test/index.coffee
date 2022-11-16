@@ -6,6 +6,7 @@ import assert from "@dashkite/assert"
 import * as Type from "@dashkite/joy/type"
 import { generic } from "@dashkite/joy/generic"
 
+import * as ACM from "../src/acm"
 import * as DynamoDB from "../src/dynamodb"
 import * as VPC from "../src/vpc"
 
@@ -16,6 +17,17 @@ import { target } from "./helpers"
 do ->
 
   print await test "Dolores", [
+
+    target "ACM", do ->
+      [
+
+        test "getCertificate", ->
+          certificate = await ACM.getCertificate "dashkite.io"
+          assert certificate?
+          assert certificate.arn?
+          assert certificate._?
+          assert.equal "dashkite.io", certificate._.DomainName
+      ]
 
     target "DynamoDB", do -> 
       [
@@ -37,16 +49,32 @@ do ->
           assert vpc.id?
           assert.equal "default", vpc.name
 
-        test "Subnet.list", ->
-          subnets = await VPC.Subnet.list()
-          assert subnets?
-          assert subnets.length?
-          for subnet in subnets
-            console.log subnet.id
-            assert subnet.id?
-            assert subnet.zone?
-            assert subnet.arn?
+        test "Subnets", [      
 
-      ]
-  
+          test "list", ->
+            subnets = await VPC.Subnets.list()
+            assert subnets?
+            assert subnets.length?
+            for subnet in subnets
+              assert subnet.id?
+              assert subnet.zone?
+              assert subnet.arn?
+
+        ]
+
+        test "SecurityGroups", [      
+
+          test "list", ->
+            groups = await VPC.SecurityGroups.list()
+            assert groups?
+            assert groups.length?
+            for group in groups
+              assert group.id?
+              assert group.description?
+              assert group.vpc?
+
+        ]
+
+      ]        
+
   ]

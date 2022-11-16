@@ -27,7 +27,7 @@ turn = (nodes, state, context) ->
       else if node.next?
         original = state.name
         state.name = await node.next context, state
-        console.log "#{original} -> #{state.name}"
+        # console.log "#{original} -> #{state.name}"
         if node.nodes?
           try
             await turn node.nodes, state, context
@@ -55,8 +55,11 @@ partition = (n, i) ->
   if batch.length > 0
     yield batch
 
+import { log } from "./logger"
+
 export {
   lift
   runNetwork
   partition
+  log
 }

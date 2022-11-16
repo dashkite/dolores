@@ -1,6 +1,6 @@
 import { CloudFormation } from "@aws-sdk/client-cloudformation"
 import * as Time from "@dashkite/joy/time"
-import { runNetwork } from "./helpers"
+import { runNetwork, log } from "./helpers"
 
 AWS =
   CloudFormation: new CloudFormation region: "us-east-1"
@@ -70,7 +70,7 @@ nodes = [
 
 deployStack = (name, template, capabilities) ->
 
-  console.log template
+  log "stack", name, template
 
   state = name: "start"
 
@@ -89,12 +89,13 @@ deployStack = (name, template, capabilities) ->
     await runNetwork nodes, state, context
   catch error
     if /No updates/.test error.toString()
-      console.log "no updates for stack [#{name}]"
+      log "stack", name, "no updates for stack [ #{name} ]"
     else
       throw error
 
 deployStackAsync = (name, _template, capabilities) ->
-  console.log _template
+  
+  log "stack", name, _template
 
   template =
     StackName: name

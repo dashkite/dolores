@@ -23,7 +23,9 @@ get = ( name = "default" ) ->
     throw new Error "Dolores: VPC.get: unexpected status
       [ #{ $metadata.httpStatusCode }"
 
-Subnet =
+# we assume here that there will not be sufficient items 
+# returned to justify using an asyc iterator
+Subnets =
   list: ( name = "default" ) ->
     vpc = await get name
     { $metadata, Subnets } = await AWS.EC2.describeSubnets 
@@ -38,7 +40,28 @@ Subnet =
       throw new Error "Dolores: VPC.Subnet.list: unexpected status
         [ #{ $metadata.httpStatusCode }"
 
+SecurityGroups =
+  list: ( name = "default" ) ->
+    vpc = await get name
+    { $metadata, SecurityGroups } = await AWS.EC2.describeSecurityGroups
+      Filters: [ 
+        { Name: "vpc-id", Values: [ vpc.id ] }
+        # assume the group name is the VPC name
+        { Name: "group-name", Values: [ name ] }
+      ]
+
+    if $metadata.httpStatusCode == 200
+      for group in SecurityGroups
+        id: group.GroupId
+        description: group.Description
+        vpc: group.VpcId
+        _: group
+    else
+      throw new Error "Dolores: VPC.SecurityGroups.list: unexpected status
+        [ #{ $metadata.httpStatusCode }"
+
 export {
   get
-  Subnet
+  Subnets
+  SecurityGroups
 }
