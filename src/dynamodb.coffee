@@ -149,7 +149,6 @@ generic updateItem, Type.isString, Type.isObject, Type.isObject, ( table, key, v
     r = {}
     ( r[ k ] = v ) for k, v of value when !key[k]?
     r
-
   AWS.DynamoDB.updateItem
     TableName: table
     Key: wrapItem key
