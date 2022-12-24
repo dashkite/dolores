@@ -28,6 +28,8 @@ list = ->
 isAliasFor = (domain) -> ({ _ }) -> _.Aliases.Items?.includes domain
 find = ( domain ) -> It.find ( isAliasFor domain ), list()
 
+getDistributionForDomain = ( domain ) -> find domain
+
 addCustomHeader = ({ domain, origin, name, value }) ->
 
   distribution = await find domain
@@ -72,4 +74,5 @@ export {
   list
   find
   addCustomHeader
+  getDistributionForDomain
 }
