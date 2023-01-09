@@ -68,8 +68,33 @@ addCustomHeader = ({ domain, origin, name, value }) ->
   else
     throw new Error "cloudfront.addCustomHeader: unexpected status [ #{ $metadata.httpStatusCode } ]"
 
+invalidatePaths = ({ domain, paths }) ->
+  distribution = await find domain
+  
+  { 
+    $metadata
+    Invalidation
+    Location 
+  } = await AWS.CloudFront.createInvalidation 
+    DistributionId: distribution.id
+    InvalidationBatch:
+      CallerReference: Date.now()
+      Paths:
+        Items: paths
+        Quantity: paths.length
+  
+  if $metadata.httpStatusCode == 201
+    console.log "cloudfront.invalidatePaths: success response", { 
+      status: Invalidation.Status 
+      paths: Invalidation.InvalidationBatch.Paths
+    }
+  else
+    throw new Error "cloudfront.invalidatePaths: unexpected status [ #{ $metadata.httpStatusCode } ]"
+
+
 export {
   list
   find
   addCustomHeader
+  invalidatePaths
 }

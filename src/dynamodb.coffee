@@ -53,7 +53,7 @@ generic unwrap, ( Val.eq "M" ), Type.isObject, ( type, object ) ->
 generic unwrap, ( Val.eq "L" ), Type.isArray, ( type, array ) ->
   ( unwrap description ) for description in array
 
-generic unwrap, ( Val.eq "BOOL" ), Type.isString, ( type, value ) -> value
+generic unwrap, ( Val.eq "BOOL" ), Type.isBoolean, ( type, value ) -> value
 
 generic unwrap, ( Val.eq "N" ), Type.isString, ( type, value ) -> Number value
 
