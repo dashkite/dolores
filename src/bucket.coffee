@@ -1,6 +1,7 @@
 import * as S3 from "@aws-sdk/client-s3"
 import * as Type from "@dashkite/joy/type"
 import { lift, partition } from "./helpers"
+import { MediaType } from "@dashkite/media-type"
 
 
 AWS =
@@ -24,23 +25,48 @@ getBucketARN = (name) ->
 
 putBucket = (name) ->
   if !( await hasBucket name )
-    await AWS.S3.createBucket Bucket: name
+    AWS.S3.createBucket Bucket: name
 
 deleteBucket = (name) ->
   if await hasBucket name
-    await AWS.S3.deleteBucket Bucket: name
+    AWS.S3.deleteBucket Bucket: name
 
 getBucketLifecycle = (name) ->
-  await AWS.S3.getBucketLifecycleConfiguration Bucket: name
+  AWS.S3.getBucketLifecycleConfiguration Bucket: name
 
 putBucketLifecycle = (name, lifecycle) ->
-  await AWS.S3.putBucketLifecycleConfiguration 
+  AWS.S3.putBucketLifecycleConfiguration 
     Bucket: name
     LifecycleConfiguration: lifecycle
 
 deleteBucketLifecycle = (name) ->
-  await AWS.S3.deleteBucketLifecycle Bucket: name
+  AWS.S3.deleteBucketLifecycle Bucket: name
 
+putBucketPolicy = ( name, policy ) ->
+  AWS.S3.putBucketPolicy
+    Bucket: name
+    Policy: JSON.stringify policy
+
+deleteBucketPolicy = ( name ) ->
+  AWS.S3.deleteBucketPolicy Bucket: name
+
+putBucketWebsite = ( name, { index, error }) ->
+  AWS.S3.putBucketWebsite
+    Bucket: name
+    WebsiteConfiguration:
+      IndexDocument: Suffix: index
+      ErrorDocument: Key: error
+      # RoutingRules: rules ? []
+
+putBucketRedirect = ( name, target ) ->
+  AWS.S3.putBucketWebsite
+    Bucket: name
+    WebsiteConfiguration:
+      RedirectAllRequestsTo:
+        HostName: target
+
+deleteBucketWebsite = ( name ) ->
+  await AWS.S3.deleteBucketWebsite
 
 headObject = (name, key) ->
   try
@@ -71,10 +97,14 @@ getObject = (name, key) ->
     null
 
 putObject = (name, key, body) ->
+
+  type = MediaType.format MediaType.fromPath key
+
   AWS.S3.putObject
     Bucket: name
     Key: key
     Body: body
+    ContentType: type
 
 deleteObject = (name, key) ->
   if await hasObject name, key
@@ -88,7 +118,7 @@ deleteObjects = (name, keys) ->
       Objects: ( Key: key for key in keys )
       Quiet: true
 
-
+# TODO return an async iterator
 listObjects = (name, prefix, items=[], token) ->
   parameters = 
     Bucket: name
@@ -121,6 +151,7 @@ deleteDirectory = (name, prefix) ->
 emptyBucket = (name) -> deleteDirectory name
 
 export {
+
   getBucketARN
   hasBucket
   putBucket
@@ -132,6 +163,14 @@ export {
   putBucketLifecycle
   deleteBucketLifecycle
 
+  putBucketPolicy
+  deleteBucketPolicy
+  
+  putBucketWebsite
+  deleteBucketWebsite
+  
+  putBucketRedirect
+
   headObject
   hasObject
   getObject
@@ -139,4 +178,5 @@ export {
   deleteObject
   deleteObjects
   listObjects
+
 }
