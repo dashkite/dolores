@@ -3,7 +3,7 @@ import * as Lambda from "@aws-sdk/client-lambda"
 import * as S3 from "@aws-sdk/client-s3"
 import * as Text from "@dashkite/joy/text"
 import * as Time from "@dashkite/joy/time"
-import { lift } from "./helpers"
+import { lift, log } from "./helpers"
 
 AWS =
   Lambda: lift Lambda
@@ -57,6 +57,7 @@ getLatestLambda = (name) ->
   result = undefined
   max = 0
   for current in Versions
+    log "lambda", name, "version: #{ current.Version }"
     if current.Version != "$LATEST"
       version = Text.parseNumber current.Version
       if version >= max
@@ -70,7 +71,11 @@ getLatestLambda = (name) ->
     version: max
 
 getLatestLambdaARN = (name) -> ( await getLatestLambda name ).arn
+
 getLambdaARN = getLatestLambdaARN
+
+getLambdaUnqualifiedARN = (name) ->
+  ( ( ( await getLambdaARN name ).split ":" )[..-2] ).join ":"
 
 defaults =
   bucket: "dolores.dashkite.com"
@@ -78,7 +83,7 @@ defaults =
   memory: 128 # max size for edge lambdas
   timeout: 5 # max timeout for edge lambdas
   handler: "build/lambda/index.handler"
-  runtime: "nodejs14.x"
+  runtime: "nodejs18.x"
 
 publishLambda = (name, data, configuration) ->
 
@@ -91,7 +96,6 @@ publishLambda = (name, data, configuration) ->
     timeout
     environment
   } = { defaults..., configuration... }
-
   _configuration =
     FunctionName: name
     Handler: handler
@@ -101,8 +105,8 @@ publishLambda = (name, data, configuration) ->
     TracingConfig: Mode: "PassThrough"
     Role: role
 
-  # if environment?
-  #   _configuration.Environment = Variables: environment
+  if environment?
+    _configuration.Environment = Variables: environment
 
   if await hasLambda name
 
@@ -127,6 +131,24 @@ publishLambda = (name, data, configuration) ->
     waitForReady name
 
 versionLambda = (name) ->
+  { Versions }  = await AWS.Lambda.listVersionsByFunction FunctionName: name
+  # delete old versions so we don't go past the pagination limit
+  if Versions.length > 10 # limit is 50, but we're being conservative
+    versions = Versions
+      .map ({ Version }) -> Version
+      .filter ( version ) -> version != "$LATEST"
+      .map  (version ) -> Text.parseNumber version
+      .sort()
+      .slice 0, 9
+      .forEach ( version ) ->
+        try
+          await AWS.Lambda.deleteFunction 
+            FunctionName: name
+            Qualifier: "#{version}"
+        catch error
+          console.warn "error attempting to purge older Lambdas"
+          console.warn "failed to delete Lambda [#{name}] version [#{version}]"
+          console.error error
   result = await AWS.Lambda.publishVersion FunctionName: name
   _: result
   arn: result.FunctionArn
@@ -157,6 +179,7 @@ export {
   getLatestLambda
   getLatestLambdaARN
   getLambdaARN
+  getLambdaUnqualifiedARN
   publishLambda
   versionLambda
   deleteLambda

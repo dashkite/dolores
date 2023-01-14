@@ -1,7 +1,7 @@
 import * as S3 from "@aws-sdk/client-s3"
+import * as Type from "@dashkite/joy/type"
 import { lift, partition } from "./helpers"
-import { generic } from "@dashkite/joy/generic"
-import { isString, isObject } from "@dashkite/joy/type"
+import { MediaType } from "@dashkite/media-type"
 
 
 AWS =
@@ -25,23 +25,48 @@ getBucketARN = (name) ->
 
 putBucket = (name) ->
   if !( await hasBucket name )
-    await AWS.S3.createBucket Bucket: name
+    AWS.S3.createBucket Bucket: name
 
 deleteBucket = (name) ->
   if await hasBucket name
-    await AWS.S3.deleteBucket Bucket: name
+    AWS.S3.deleteBucket Bucket: name
 
 getBucketLifecycle = (name) ->
-  await AWS.S3.getBucketLifecycleConfiguration Bucket: name
+  AWS.S3.getBucketLifecycleConfiguration Bucket: name
 
 putBucketLifecycle = (name, lifecycle) ->
-  await AWS.S3.putBucketLifecycleConfiguration 
+  AWS.S3.putBucketLifecycleConfiguration 
     Bucket: name
     LifecycleConfiguration: lifecycle
 
 deleteBucketLifecycle = (name) ->
-  await AWS.S3.deleteBucketLifecycle Bucket: name
+  AWS.S3.deleteBucketLifecycle Bucket: name
 
+putBucketPolicy = ( name, policy ) ->
+  AWS.S3.putBucketPolicy
+    Bucket: name
+    Policy: JSON.stringify policy
+
+deleteBucketPolicy = ( name ) ->
+  AWS.S3.deleteBucketPolicy Bucket: name
+
+putBucketWebsite = ( name, { index, error }) ->
+  AWS.S3.putBucketWebsite
+    Bucket: name
+    WebsiteConfiguration:
+      IndexDocument: Suffix: index
+      ErrorDocument: Key: error
+      # RoutingRules: rules ? []
+
+putBucketRedirect = ( name, target ) ->
+  AWS.S3.putBucketWebsite
+    Bucket: name
+    WebsiteConfiguration:
+      RedirectAllRequestsTo:
+        HostName: target
+
+deleteBucketWebsite = ( name ) ->
+  await AWS.S3.deleteBucketWebsite
 
 headObject = (name, key) ->
   try
@@ -53,39 +78,33 @@ headObject = (name, key) ->
 hasObject = (name, key) ->
   if ( await headObject name, key )? then true else false
 
-getObject = ( name, key ) ->
+getObject = (name, key) ->
   try
-    await AWS.S3.getObject Bucket: name, Key: key
+    { Key, ETag, Body } = await AWS.S3.getObject Bucket: name, Key: key
+    key: key
+    hash: ETag.replace /"/g, ""
+    content: await do ->
+      if Type.isString Body
+        Body
+      else
+        result = []
+        for await data from Body
+          result = [ result..., data... ]
+        Uint8Array.from result
   catch error
+    console.error error
     rescueNotFound error
     null
 
-isS3Object = (value) -> ( isObject value ) && value.Body?
+putObject = (name, key, body) ->
 
-streamObject = generic name: "streamObject"
+  type = MediaType.format MediaType.fromPath key
 
-generic streamObject, isS3Object, isString, ( { Body }, encoding ) ->
-  if encoding == "binary"
-    Body
-  else
-    new Promise (resolve, reject) ->
-      Body.setEncoding encoding
-      output = ""
-      Body.on "data", (chunk) -> output += chunk
-      Body.on "error", (error) -> reject error
-      Body.on "end", -> resolve output
-
-generic streamObject, isS3Object, ( object ) ->
-  streamObject object, "utf8"
-
-generic streamObject, isString, isString, isString, ( name, key, encoding ) ->
-  streamObject ( await getObject name, key ), encoding
-
-generic streamObject, isString, isString, ( name, key ) ->
-  streamObject await getObject name, key
-
-putObject = (parameters) ->
-  AWS.S3.putObject parameters
+  AWS.S3.putObject
+    Bucket: name
+    Key: key
+    Body: body
+    ContentType: type
 
 deleteObject = (name, key) ->
   if await hasObject name, key
@@ -99,7 +118,7 @@ deleteObjects = (name, keys) ->
       Objects: ( Key: key for key in keys )
       Quiet: true
 
-
+# TODO return an async iterator
 listObjects = (name, prefix, items=[], token) ->
   parameters = 
     Bucket: name
@@ -112,12 +131,13 @@ listObjects = (name, prefix, items=[], token) ->
     Contents
     NextContinuationToken
   } = await AWS.S3.listObjectsV2 parameters
-  
+
+  if Contents?
+    items = [ items..., Contents... ]
   if IsTruncated
-    items = items.concat Contents
     await listObjects name, prefix, items, NextContinuationToken
   else
-    items.concat Contents
+    items
 
 deleteDirectory = (name, prefix) ->
   keys = []
@@ -131,6 +151,7 @@ deleteDirectory = (name, prefix) ->
 emptyBucket = (name) -> deleteDirectory name
 
 export {
+
   getBucketARN
   hasBucket
   putBucket
@@ -142,12 +163,20 @@ export {
   putBucketLifecycle
   deleteBucketLifecycle
 
+  putBucketPolicy
+  deleteBucketPolicy
+  
+  putBucketWebsite
+  deleteBucketWebsite
+  
+  putBucketRedirect
+
   headObject
   hasObject
   getObject
-  streamObject
   putObject
   deleteObject
   deleteObjects
   listObjects
+
 }
