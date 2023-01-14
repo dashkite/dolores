@@ -101,11 +101,11 @@ hasTable = (name) ->
 getTableARN = (name) ->
   "arn:aws:dynamodb:#{region}:*:table/#{name}"
 
-createTable = (configuration) ->
-  AWS.DynamoDB.createTable configuration
+createTable = AWS.DynamoDB.createTable
 
-updateTable = (configuration) ->
-  AWS.DynamoDB.updateTable configuration
+updateTimeToLive = AWS.DynamoDB.updateTimeToLive
+
+updateTable = AWS.DynamoDB.updateTable
 
 deleteTable = (name) ->
   if await hasTable name
@@ -120,6 +120,8 @@ listTables = ->
       ExclusiveStartTableName = LastEvaluatedTableName
     else
       break
+
+executeStatement = AWS.DynamoDB.executeStatement
 
 query = ( query ) ->
   NextToken = undefined
@@ -173,9 +175,11 @@ export {
   hasTable
   getTableARN
   createTable
+  updateTimeToLive
   updateTable
   deleteTable
   listTables
+  executeStatement
   query
   getItem
   deleteItem
