@@ -35,11 +35,11 @@
   },
   "homepage": "https://github.com/dashkite/dolores#readme",
   "devDependencies": {
-    "@dashkite/amen": "^0.1.2",
-    "@dashkite/amen-console": "^0.0.1",
+    "@dashkite/amen": "^0.2.0",
+    "@dashkite/amen-console": "^0.0.2",
     "@dashkite/assert": "^0.1.4",
     "@dashkite/genie": "^0.5.11",
-    "@dashkite/genie-presets": "^0.5.7"
+    "@dashkite/genie-presets": "^0.6.0"
   },
   "dependencies": {
     "@aws-sdk/client-acm": "^3.42.0",
