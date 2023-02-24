@@ -42,6 +42,23 @@ putBucketLifecycle = (name, lifecycle) ->
 deleteBucketLifecycle = (name) ->
   await AWS.S3.deleteBucketLifecycle Bucket: name
 
+putBucketWebsite = ( name, { index, error }) ->
+  AWS.S3.putBucketWebsite
+    Bucket: name
+    WebsiteConfiguration:
+      IndexDocument: Suffix: index
+      ErrorDocument: Key: error
+
+putBucketRedirect = ( name, target ) ->
+  AWS.S3.putBucketWebsite
+    Bucket: name
+    WebsiteConfiguration:
+      RedirectAllRequestsTo:
+        HostName: target
+
+deleteBucketWebsite = ( name ) ->
+  AWS.S3.deleteBucketWebsite Bucket: name
+
 
 headObject = (name, key) ->
   try
@@ -141,6 +158,10 @@ export {
   getBucketLifecycle
   putBucketLifecycle
   deleteBucketLifecycle
+
+  putBucketWebsite
+  putBucketRedirect
+  deleteBucketWebsite
 
   headObject
   hasObject
