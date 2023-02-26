@@ -41,6 +41,7 @@
   "dependencies": {
     "@aws-sdk/client-acm": "^3.42.0",
     "@aws-sdk/client-cloudformation": "^3.42.0",
+    "@aws-sdk/client-cloudfront": "^3.279.0",
     "@aws-sdk/client-dynamodb": "^3.58.0",
     "@aws-sdk/client-iam": "^3.42.0",
     "@aws-sdk/client-kinesis": "^3.81.0",
