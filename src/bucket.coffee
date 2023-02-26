@@ -134,7 +134,7 @@ listObjects = (name, prefix, items=[], token) ->
 
   {
     IsTruncated
-    Contents
+    Contents = []
     NextContinuationToken
   } = await AWS.S3.listObjectsV2 parameters
   
