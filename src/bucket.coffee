@@ -42,6 +42,14 @@ putBucketLifecycle = (name, lifecycle) ->
 deleteBucketLifecycle = (name) ->
   await AWS.S3.deleteBucketLifecycle Bucket: name
 
+putBucketPolicy = ( name, policy ) ->
+  AWS.S3.putBucketPolicy
+    Bucket: name
+    Policy: JSON.stringify policy
+
+deleteBucketPolicy = ( name ) ->
+  AWS.S3.deleteBucketPolicy Bucket: name
+
 putBucketWebsite = ( name, { index, error }) ->
   AWS.S3.putBucketWebsite
     Bucket: name
@@ -158,6 +166,9 @@ export {
   getBucketLifecycle
   putBucketLifecycle
   deleteBucketLifecycle
+
+  putBucketPolicy
+  deleteBucketPolicy
 
   putBucketWebsite
   putBucketRedirect
