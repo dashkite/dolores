@@ -104,20 +104,18 @@ getTableARN = (name) ->
 
 createTable = ( input, { pitr = false } = {}) ->
   await AWS.DynamoDB.createTable input
-  do ->
-    if pitr
-      loop
-        table = await getTable input.TableName
-        if table?.TableStatus == "ACTIVE"
-          backups = AWS.DynamoDB.describeContinuousBackups
-            TableName: input.TableName
-          break if backups.ContinuousBackupsDescription?.ContinuousBackupsStatus == "ENABLED"
-        await Time.sleep 500
-      AWS.DynamoDB.updateContinuousBackups
-        TableName: input.TableName
-        PointInTimeRecoverySpecification:
-          PointInTimeRecoveryEnabled: true
-  return
+  if pitr
+    loop
+      table = await getTable input.TableName
+      if table?.TableStatus == "ACTIVE"
+        backups = await AWS.DynamoDB.describeContinuousBackups
+          TableName: input.TableName
+        break if backups.ContinuousBackupsDescription?.ContinuousBackupsStatus == "ENABLED"
+      await Time.sleep 500
+    AWS.DynamoDB.updateContinuousBackups
+      TableName: input.TableName
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
 
 updateTimeToLive = AWS.DynamoDB.updateTimeToLive
 
