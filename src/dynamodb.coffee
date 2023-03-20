@@ -3,6 +3,7 @@ import { lift, partition } from "./helpers"
 import { generic } from "@dashkite/joy/generic"
 import * as Val from "@dashkite/joy/value"
 import * as Type from "@dashkite/joy/type"
+import * as Time from "@dashkite/joy/time"
 
 AWS =
   DynamoDB: lift DynamoDB
@@ -101,7 +102,22 @@ hasTable = (name) ->
 getTableARN = (name) ->
   "arn:aws:dynamodb:#{region}:*:table/#{name}"
 
-createTable = AWS.DynamoDB.createTable
+createTable = ( input, { pitr = false } = {}) ->
+  await AWS.DynamoDB.createTable input
+  do ->
+    if pitr
+      loop
+        table = await getTable input.TableName
+        if table?.TableStatus == "ACTIVE"
+          backups = AWS.DynamoDB.describeContinuousBackups
+            TableName: input.TableName
+          break if backups.ContinuousBackupsDescription?.ContinuousBackupsStatus == "ENABLED"
+        await Time.sleep 500
+      AWS.DynamoDB.updateContinuousBackups
+        TableName: input.TableName
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+  return
 
 updateTimeToLive = AWS.DynamoDB.updateTimeToLive
 
