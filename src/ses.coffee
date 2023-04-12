@@ -16,7 +16,7 @@ getTemplate = (name) ->
     else
       throw error
 
-publishSES = ({name, html, subject, text}) ->
+publishTemplate = ({name, html, subject, text}) ->
   params = 
     Template:
       TemplateName: name
@@ -29,6 +29,10 @@ publishSES = ({name, html, subject, text}) ->
   else
     await AWS.SES.createTemplate params
 
+deleteTemplate = ( name ) ->
+  if await templateExists name
+    await AWS.SES.deleteTemplate TemplateName: name
+
 sendEmail = ({source, template, toAddresses, templateData}) ->
   jsonTemplateData = JSON.stringify templateData
   params = 
@@ -39,4 +43,4 @@ sendEmail = ({source, template, toAddresses, templateData}) ->
 
   await AWS.SES.sendTemplatedEmail params
 
-export { publishSES, sendEmail }
+export { publishTemplate, deleteTemplate, sendEmail }
