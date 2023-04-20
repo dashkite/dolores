@@ -43,7 +43,7 @@ deleteBucketLifecycle = (name) ->
   AWS.S3.deleteBucketLifecycle Bucket: name
 
 putBucketPolicy = ( name, policy ) ->
-  AWS.S3.putBucketPolicy
+  response = await AWS.S3.putBucketPolicy
     Bucket: name
     Policy: JSON.stringify policy
 
