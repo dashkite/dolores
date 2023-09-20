@@ -1,9 +1,9 @@
 import FS from "node:fs/promises"
 import Path from "node:path"
 
-# TODO make logger path configurable
-#      no need to hardcode to .sky/log
-$root = Path.resolve ".sky", "log"
+$root = Path.resolve "log"
+
+configure = ({ root }) -> $root = root
 
 log = ( topic, name, text ) ->
   path = Path.join $root, topic, name
