@@ -5,9 +5,9 @@ import { deployStack } from "./stack"
 AWS =
   Route53: lift Route53
 
-getTLD = (domain) -> (( domain.split "." )[-2..]).join "."
+getTLD = ( domain ) -> (( domain.split "." )[-2..]).join "."
 
-getHostedZone = (domain) ->
+getHostedZone = ( domain ) ->
   { HostedZones } = await AWS.Route53.listHostedZones MaxItems: "100"
   for zone in HostedZones
     if domain == zone.Name[..-2]

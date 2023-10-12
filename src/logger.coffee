@@ -18,4 +18,4 @@ clean = ->
 
 
 
-export { log, clean }
+export { configure, log, clean }

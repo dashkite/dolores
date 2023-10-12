@@ -69,8 +69,9 @@ nodes = [
 ]
 
 deployStack = (name, template, capabilities) ->
-
-  log "stack", name, template
+  # ugh - we need a better logging solution
+  date = new Date
+  log "stack", "#{ name }-#{ date.toISOString() }", template
 
   state = name: "start"
 
