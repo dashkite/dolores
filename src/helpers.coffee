@@ -4,7 +4,13 @@ lift = (M, options) ->
   client = undefined
 
   proxy = ( command ) -> 
-    ( parameters = {} ) -> client.send new command parameters
+    ( parameters = {} ) ->
+      response = await client.send new command parameters
+      if 200 <= response.$metadata.httpStatusCode < 300
+        response
+      else
+        threw new Error "Command #{ command } failed
+          with status code #{ response.$metadata.httpStatusCode }"
 
   N = {}
   for key, value of M
@@ -55,11 +61,12 @@ partition = (n, i) ->
   if batch.length > 0
     yield batch
 
-import { log } from "./logger"
+export { log } from "./logger"
+
+
 
 export {
   lift
   runNetwork
   partition
-  log
 }

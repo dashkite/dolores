@@ -5,30 +5,30 @@ AWS =
   SNS: lift SNS
 
 # also works as get
-create = ( topic ) ->
-  { TopicArn } = await AWS.SNS.createTopic
-    Name: "#{ topic }"
+create = get = ( topic ) ->
+  { TopicArn } = await AWS.SNS.createTopic Name: "#{ topic }"
   name: topic
   arn: TopicArn
 
 remove = ( topic ) ->
 
-
 publish = ( topic, message ) ->
-  await AWS.SNS.publish
+  { MessageId } = await AWS.SNS.publish
     TopicArn: topic.arn
-    Message: message
-    # MessageGroupId: "default"
-    # MessageDeduplicationId: performance.now()
-  message
+    Message: JSON.stringify message
+  id: MessageId
 
 subscribe = ( topic, queue ) ->
-  await AWS.SNS.subscribe
+  { SubscriptionArn } = await AWS.SNS.subscribe
     TopicArn: topic.arn
     Protocol: "sqs"
     Endpoint: queue.arn
+    Attributes:
+      RawMessageDelivery: true
+  arn: SubscriptionArn
 
 export { 
+  get
   create
   publish
   subscribe

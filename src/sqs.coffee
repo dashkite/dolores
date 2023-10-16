@@ -129,29 +129,103 @@ popMessages = (name, options) ->
 
 create = ( name ) ->
   account = await getAccount()
+  arn = "arn:aws:sqs:#{region}:#{account}:#{name}"
   { QueueUrl } = await AWS.SQS.createQueue
     QueueName: "#{ name }"
+    # allow SNS to send messages by default
+
+    # TODO AWS recommends specifying the topic
+    # Ex:
+    #   Condition:
+    #     ArnLike:
+    #       "aws:SourceArn": "arn:aws:sns:..."
+    # but that would require:
+    # - getting the queue attributes
+    # - adding a policy for the topic
+    # - updating the queue attributes
+    # on each subscription.
+    # Not sure it's worth it, given that the
+    # publish request must already be from
+    # AWS (due the Principal constraint).
+
+    Attributes:
+      SqsManagedSseEnabled: false
+      Policy: JSON.stringify
+        Version: "2012-10-17"
+        Statement: [
+          Effect: "Allow"
+          Principal: Service: [ "sns.amazonaws.com" ]
+          Action: [ "SQS:SendMessage" ]
+          Resource: "#{ arn }"
+        ]    
+  name: name
   url: QueueUrl
-  arn: "arn:aws:sqs:#{region}:#{account}:#{name}"
+  arn: arn
 
-pop = ( queue ) ->
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Principal": {
+#         "Service": "sns.amazonaws.com"
+#       },
+#       "Action": "*"
+#     },
+#     {
+#       "Sid": "topic-subscription-arn:aws:sns:us-east-1:618441030511:test-topic-sns",
+#       "Effect": "Allow",
+#       "Principal": {
+#         "AWS": "*"
+#       },
+#       "Action": "SQS:SendMessage",
+#       "Resource": "arn:aws:sqs:us-east-1:618441030511:test-queue-sns",
+#       "Condition": {
+#         "ArnLike": {
+#           "aws:SourceArn": "arn:aws:sns:us-east-1:618441030511:test-topic-sns"
+#         }
+#       }
+#     }
+#   ]
+# }
 
-  { Messages } = await AWS.SQS.receiveMessage
+_receive = ( queue, options = {}) ->
+  { Messages } = await AWS.SQS.receiveMessage {
     AttributeNames: [ "All" ]
     MessageAttributeNames: [ "All" ]
     QueueUrl: queue.url
-
+    options...
+  }
   messages = []
-
   if Messages?
-    for { ReceiptHandle, Body } in Messages
+    handles = []
+    for { MessageId, ReceiptHandle, Body } in Messages
       handles.push ReceiptHandle
-      messages.push Body
-      
-    if handles.length > 0
-      _deleteMessages queue.url, handles
-      
+      messages.push
+        id: MessageId
+        content: JSON.parse Body
+    remove queue, handles
   messages
+
+push = send = ( queue, message ) ->
+  { MessageId } = await AWS.SQS.sendMessage
+    MessageBody: JSON.stringify message
+    QueueUrl: queue.url
+  id: MessageId
+
+pop = receive = ( queue ) -> _receive queue
+
+poll = ( queue ) ->
+  _receive queue,
+    WaitTimeSeconds: 20 # max allowed
+
+remove = ( queue, handles ) ->
+  AWS.SQS.deleteMessageBatch
+    QueueUrl: queue.url
+    Entries: do ->
+      for handle, index in handles
+        Id: "#{ index }"
+        ReceiptHandle: handle
 
 export {
   _createQueue
@@ -164,6 +238,10 @@ export {
   pushMessage
   popMessages
 
-  pop
   create
+  push
+  send
+  pop
+  receive
+  poll
 }
