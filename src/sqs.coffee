@@ -217,7 +217,8 @@ pop = receive = ( queue ) -> _receive queue
 
 poll = ( queue ) ->
   _receive queue,
-    WaitTimeSeconds: 20 # max allowed
+    WaitTimeSeconds: 20      # max allowed
+    MaxNumberOfMessages: 10  # max allowed
 
 remove = ( queue, handles ) ->
   AWS.SQS.deleteMessageBatch
@@ -226,6 +227,10 @@ remove = ( queue, handles ) ->
       for handle, index in handles
         Id: "#{ index }"
         ReceiptHandle: handle
+
+getARN = ( name ) ->
+  account = await getAccount()
+  "arn:aws:sqs:#{region}:#{account}:#{name}"
 
 export {
   _createQueue
@@ -244,4 +249,5 @@ export {
   pop
   receive
   poll
+  getARN
 }

@@ -51,8 +51,8 @@ dependencies:
     specifier: ^3.254.0
     version: 3.418.0
   '@dashkite/joy':
-    specifier: ^0.3.16
-    version: 0.3.16
+    specifier: link:../joy
+    version: link:../joy
   '@dashkite/media-type':
     specifier: link:../media-type
     version: link:../media-type
@@ -1356,6 +1356,7 @@ packages:
 
   /@dashkite/joy@0.3.16:
     resolution: {integrity: sha512-dsU0us4j1Pb+zceoBvLbnZ2PbmULkJUtM2vtWLxKmoc1DE4w9SVTiPTe6JWvF0A0vk90ldv+Lc9qEA5x3O+DtQ==}
+    dev: true
 
   /@smithy/abort-controller@2.0.9:
     resolution: {integrity: sha512-8liHOEbx99xcy4VndeQNQhyA0LS+e7UqsuRnDTSIA26IKBv/7vA9w09KOd4fgNULrvX0r3WpA6cwsQTRJpSWkg==}
