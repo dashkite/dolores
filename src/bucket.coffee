@@ -1,4 +1,5 @@
 import * as S3 from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import * as Type from "@dashkite/joy/type"
 import { lift, partition } from "./helpers"
 import { MediaType } from "@dashkite/media-type"
@@ -150,6 +151,20 @@ deleteDirectory = (name, prefix) ->
 
 emptyBucket = (name) -> deleteDirectory name
 
+getUploadURL = ( name, key, contentType ) ->
+  params = { Bucket: name, Key: key }
+  if contentType? then params.ContentType = contentType
+  putCommand = new S3.PutObjectCommand params
+  client = new S3.S3Client region: "us-east-1"
+  getSignedUrl client, putCommand
+
+putCORSConfig = ( input ) ->
+  AWS.S3.putBucketCors input
+
+deletePublicAccessBlock = ( name ) ->
+  AWS.S3.deletePublicAccessBlock 
+    Bucket: name
+
 export {
 
   getBucketARN
@@ -178,5 +193,11 @@ export {
   deleteObject
   deleteObjects
   listObjects
+
+  getUploadURL
+
+  putCORSConfig
+
+  deletePublicAccessBlock
 
 }
