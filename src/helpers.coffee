@@ -1,3 +1,11 @@
+class HTTPError extends Error
+  constructor: ( response ) ->
+    status = response.$metadata.httpStatusCode
+    super "HTTP Error: #{ status }"
+    @_ = response
+    @status = status
+
+
 lift = (M, options) ->
 
   options ?= region: "us-east-1"
@@ -9,8 +17,7 @@ lift = (M, options) ->
       if 200 <= response.$metadata.httpStatusCode < 300
         response
       else
-        threw new Error "Command #{ command } failed
-          with status code #{ response.$metadata.httpStatusCode }"
+        threw new Error response
 
   N = {}
   for key, value of M
