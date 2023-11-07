@@ -1,8 +1,8 @@
 class HTTPError extends Error
-  constructor: ( response ) ->
-    status = response.$metadata.httpStatusCode
+  constructor: ( error ) ->
+    status = error.$metadata.httpStatusCode
     super "HTTP Error: #{ status }"
-    @_ = response
+    @_ = error
     @status = status
 
 
@@ -13,11 +13,15 @@ lift = (M, options) ->
 
   proxy = ( command ) -> 
     ( parameters = {} ) ->
-      response = await client.send new command parameters
-      if 200 <= response.$metadata.httpStatusCode < 300
-        response
-      else
-        threw new Error response
+      try
+        await client.send new command parameters
+      catch error
+        if error.$metadata?.httpStatusCode?
+          if process.env.DEBUG?
+            console.log error
+          throw new HTTPError error
+        else
+          throw error
 
   N = {}
   for key, value of M

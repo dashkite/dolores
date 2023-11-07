@@ -107,6 +107,8 @@ publishLambda = (name, data, configuration) ->
 
   if environment?
     _configuration.Environment = Variables: environment
+  else
+    _configuration.Environment = Variables: {}
 
   if await hasLambda name
 
@@ -139,7 +141,9 @@ versionLambda = (name) ->
       .filter ( version ) -> version != "$LATEST"
       .map  (version ) -> Text.parseNumber version
       .sort()
-      .slice 0, 9
+      # only delete the oldest so we don't accidentaly
+      # try to delete a replicated (active) edge lambda
+      .slice 0, 1
       .forEach ( version ) ->
         try
           await AWS.Lambda.deleteFunction 
