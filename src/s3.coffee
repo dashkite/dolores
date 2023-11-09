@@ -99,7 +99,7 @@ getObject = (name, key) ->
     rescueNotFound error
     null
 
-putObject = (bucket, key, body) ->
+putObject = ( bucket, key, body ) ->
 
   type = MediaType.format MediaType.fromPath key
 
@@ -112,7 +112,6 @@ putObject = (bucket, key, body) ->
 deleteObject = (name, key) ->
   if await hasObject name, key
     await AWS.S3.deleteObject Bucket: name, Key: key
-
 
 deleteObjects = (name, keys) ->
   await AWS.S3.deleteObjects
