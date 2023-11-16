@@ -12,20 +12,23 @@ AWS =
 md5 = (buffer) ->
   Crypto.createHash('md5').update(buffer).digest("base64")
 
-hasLambda = (name) -> (await getLambda name)?
+hasLambda = (name) ->
+  try
+    await getLambda name
+    true
+  catch error
+    # TODO we should probably also check for an HTTPError instance
+    if error.status == 404
+      false
+    else
+      throw error
 
 getLambda = (name) ->
-  try
     lambda = await AWS.Lambda.getFunction FunctionName: name
     _: lambda
     arn: lambda.Configuration.FunctionArn
     state: lambda.Configuration.State
     lastStatus: lambda.Configuration.LastUpdateStatus
-  catch error
-    if /ResourceNotFoundException/.test error.toString()
-      undefined
-    else
-      throw error
 
 # AWS added internal state management to Lambda in an effort to improve the performance
 # of the invocation cycle. This is a broad helper to wait until the lambda is ready
