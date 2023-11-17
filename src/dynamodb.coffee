@@ -88,7 +88,9 @@ getTable = (name) ->
     { Table } = await AWS.DynamoDB.describeTable TableName: name
     Table
   catch error
-    if /ResourceNotFoundException/.test error.toString()
+    # for some reason, describe table returns a 400 for
+    # a resource not found 
+    if error.status == 404 || error.status == 400
       null
     else
       throw error
