@@ -11,8 +11,8 @@ getTemplate = (name) ->
     template = await AWS.SES.getTemplate TemplateName: name
     _: template
   catch error
-    if /TemplateDoesNotExist/.test error.toString()
-      undefined
+    if ( error.status == 404 ) || ( error.status == 400 )
+      null
     else
       throw error
 

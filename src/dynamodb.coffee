@@ -90,7 +90,7 @@ getTable = (name) ->
   catch error
     # for some reason, describe table returns a 400 for
     # a resource not found 
-    if error.status == 404 || error.status == 400
+    if ( error.status == 404 ) || ( error.status == 400 )
       null
     else
       throw error

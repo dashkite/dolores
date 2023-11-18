@@ -17,8 +17,6 @@ lift = (M, options) ->
         await client.send new command parameters
       catch error
         if error.$metadata?.httpStatusCode?
-          if process.env.DEBUG?
-            console.log error
           throw new HTTPError error
         else
           throw error
