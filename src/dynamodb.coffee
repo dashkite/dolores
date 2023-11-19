@@ -102,7 +102,7 @@ hasTable = (name) ->
     false
 
 getTableARN = (name) ->
-  "arn:aws:dynamodb:#{region}:*:table/#{name}"
+  "arn:aws:dynamodb:*:*:table/#{name}"
 
 createTable = ( input, { pitr = false } = {}) ->
   await AWS.DynamoDB.createTable input

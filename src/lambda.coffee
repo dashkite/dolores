@@ -98,6 +98,7 @@ publishLambda = (name, data, configuration) ->
     memory
     timeout
     environment
+    permissions
   } = { defaults..., configuration... }
   _configuration =
     FunctionName: name
@@ -134,6 +135,11 @@ publishLambda = (name, data, configuration) ->
     }
 
     waitForReady name
+
+  if permissions?
+    for permission in permissions
+      await AWS.Lambda.addPermission permission
+
 
 versionLambda = (name) ->
   { Versions }  = await AWS.Lambda.listVersionsByFunction FunctionName: name
@@ -178,6 +184,42 @@ _invokeLambda = (name, sync, input) ->
 invokeLambda = (name, input) -> _invokeLambda name, false, input
 syncInvokeLambda = (name, input) -> _invokeLambda name, true, input
 
+hasFunctionURL = ( name ) ->
+  try
+    await getFunctionURL name
+    true
+  catch error
+    # TODO we should probably also check for an HTTPError instance
+    if error.status == 404
+      false
+    else
+      throw error
+
+getFunctionURL = ( name ) ->
+  AWS.Lambda.getFunctionUrlConfig FunctionName: name
+
+buildFunctionURLOptions = ({ name, open, streaming, cors }) ->
+  FunctionName: name
+  AuthType: if open == true 
+      "NONE"
+    else "AWS_IAM"
+  InvokeMode: if streaming == true
+      "RESPONSE_STREAM" 
+    else "BUFFERED"
+  Cors: if cors = true
+    AllowCredentials: true
+    AllowHeaders: [ "*" ]
+    AllowMethods: [ "*" ]
+    AllowOrigins: [ "*" ]
+    ExposeHeaders: [ "*" ]
+    MaxAge: 3600 
+
+createFunctionURL = ( options ) ->
+  AWS.Lambda.createFunctionUrlConfig buildFunctionURLOptions options
+
+updateFunctionURL = ( options ) ->
+  AWS.Lambda.updateFunctionUrlConfig buildFunctionURLOptions options
+
 export {
   hasLambda
   getLambda
@@ -192,4 +234,8 @@ export {
   deleteLambda
   invokeLambda
   syncInvokeLambda
+  createFunctionURL
+  updateFunctionURL
+  getFunctionURL
+  hasFunctionURL
 }
