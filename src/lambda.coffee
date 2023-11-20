@@ -125,7 +125,7 @@ publishLambda = (name, data, configuration) ->
     
     await AWS.Lambda.updateFunctionConfiguration _configuration
 
-    waitForReady name
+    await waitForReady name
 
   else
 
@@ -134,34 +134,23 @@ publishLambda = (name, data, configuration) ->
       Code: ZipFile: data
     }
 
-    waitForReady name
+    await waitForReady name
 
   if permissions?
     for permission in permissions
       await AWS.Lambda.addPermission permission
 
+listVersions = ( name ) ->
+  NextToken = undefined
+  loop
+    { Versions, NextToken } = await AWS.Lambda.listVersionsByFunction FunctionName: name
+    for version in Versions
+      yield version
+    if NextToken? then continue else return
+
+# TODO prune oldest N versions (using listVersions async iterator)
 
 versionLambda = (name) ->
-  { Versions }  = await AWS.Lambda.listVersionsByFunction FunctionName: name
-  # delete old versions so we don't go past the pagination limit
-  if Versions.length > 10 # limit is 50, but we're being conservative
-    versions = Versions
-      .map ({ Version }) -> Version
-      .filter ( version ) -> version != "$LATEST"
-      .map  (version ) -> Text.parseNumber version
-      .sort()
-      # only delete the oldest so we don't accidentaly
-      # try to delete a replicated (active) edge lambda
-      .slice 0, 1
-      .forEach ( version ) ->
-        try
-          await AWS.Lambda.deleteFunction 
-            FunctionName: name
-            Qualifier: "#{version}"
-        catch error
-          console.warn "error attempting to purge older Lambdas"
-          console.warn "failed to delete Lambda [#{name}] version [#{version}]"
-          console.error error
   result = await AWS.Lambda.publishVersion FunctionName: name
   _: result
   arn: result.FunctionArn

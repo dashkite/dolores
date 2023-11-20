@@ -20,7 +20,11 @@ lift = (M, options) ->
           throw new HTTPError error
         else
           throw error
-
+  
+  metal = ( command ) ->
+    ( parameters = {} ) ->
+      client.send new command parameters
+  
   N = {}
   for key, value of M
     if key.endsWith "Command"
@@ -28,6 +32,7 @@ lift = (M, options) ->
         .replace /Command$/, ""
         .replace /^[A-Z]/, (c) -> c.toLowerCase()
       N[ name ] = proxy value
+      N[ "_#{ name }"] = metal value
     else if key.endsWith "Client"
       client = new value options
   N

@@ -151,14 +151,17 @@ query = ( query ) ->
   undefined
 
 getItem = ( table, key ) ->
-  response = await AWS.DynamoDB.getItem
-    TableName: table
-    Key: wrapItem key
-  if response.$metadata.httpStatusCode == 200
+  try
+    response = await AWS.DynamoDB.getItem
+      TableName: table
+      Key: wrapItem key
     if response.Item?
       unwrapItem response.Item
-  else throw new Error "getItem failed with status 
-    #{ response.$metadata.httpStatusCode }"
+  catch error
+    console.log error
+    if error.status == 400 || error.status == 404
+      null
+    else throw error
 
 updateItem = generic name: "updateItem"
 
