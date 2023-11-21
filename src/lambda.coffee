@@ -125,8 +125,6 @@ publishLambda = (name, data, configuration) ->
     
     await AWS.Lambda.updateFunctionConfiguration _configuration
 
-    await waitForReady name
-
   else
 
     await AWS.Lambda.createFunction {
@@ -134,11 +132,18 @@ publishLambda = (name, data, configuration) ->
       Code: ZipFile: data
     }
 
-    await waitForReady name
+  await waitForReady name
 
   if permissions?
     for permission in permissions
-      await AWS.Lambda.addPermission permission
+      try
+        await AWS.Lambda.addPermission permission
+      catch error
+        # there appears to be no way to get the existing
+        # permissions and the only source of 409s is
+        # when the resource exists, so :shrug:
+        if error.status != 409
+          throw error
 
 listVersions = ( name ) ->
   NextToken = undefined

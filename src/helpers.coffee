@@ -1,10 +1,9 @@
 class HTTPError extends Error
   constructor: ( error ) ->
     status = error.$metadata.httpStatusCode
-    super "HTTP Error: #{ status }"
+    super "HTTP Error: #{ status }. #{ error.message }"
     @_ = error
     @status = status
-
 
 lift = (M, options) ->
 

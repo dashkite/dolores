@@ -131,7 +131,7 @@ create = ( name ) ->
   account = await getAccount()
   arn = "arn:aws:sqs:#{region}:#{account}:#{name}"
   { QueueUrl } = await AWS.SQS.createQueue
-    QueueName: "#{ name }"
+    QueueName: name
     # allow SNS to send messages by default
 
     # TODO AWS recommends specifying the topic
@@ -149,7 +149,7 @@ create = ( name ) ->
     # AWS (due the Principal constraint).
 
     Attributes:
-      SqsManagedSseEnabled: false
+      SqsManagedSseEnabled: "false"
       Policy: JSON.stringify
         Version: "2012-10-17"
         Statement: [
@@ -197,7 +197,7 @@ _receive = ( queue, options = {}) ->
     options...
   }
   messages = []
-  if Messages?
+  if Messages? && Messages.length > 0
     handles = []
     for { MessageId, ReceiptHandle, Body } in Messages
       handles.push ReceiptHandle
