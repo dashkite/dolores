@@ -57,11 +57,11 @@ dependencies:
     specifier: ^3.420.0
     version: 3.456.0
   '@dashkite/joy':
-    specifier: link:../joy
-    version: link:../joy
+    specifier: ^0.3.16
+    version: 0.3.16
   '@dashkite/media-type':
-    specifier: link:../media-type
-    version: link:../media-type
+    specifier: ^0.1.0
+    version: 0.1.0
   js-yaml:
     specifier: ^4.1.0
     version: 4.1.0
@@ -1464,7 +1464,19 @@ packages:
 
   /@dashkite/joy@0.3.16:
     resolution: {integrity: sha512-dsU0us4j1Pb+zceoBvLbnZ2PbmULkJUtM2vtWLxKmoc1DE4w9SVTiPTe6JWvF0A0vk90ldv+Lc9qEA5x3O+DtQ==}
-    dev: true
+
+  /@dashkite/media-type@0.1.0:
+    resolution: {integrity: sha512-wWsfXm5dQN2IyDukfWR/BULDeiAa3K69RDk1+ecnmyUuref+joo5n/3vQoEbynLx+lqFP9PsnK1y2RxZgDXm4w==}
+    dependencies:
+      '@dashkite/joy': 0.3.16
+      '@dashkite/parse': 0.4.3
+    dev: false
+
+  /@dashkite/parse@0.4.3:
+    resolution: {integrity: sha512-bE0kBjaGYjUnCzWJelQnx8vsfJ9YP07aRTVFZoY7TZWvMmnihoCSugL4IVWAOA2O0EAZXjT8FcjA4bNJ/BQwwg==}
+    dependencies:
+      '@dashkite/joy': 0.3.16
+    dev: false
 
   /@smithy/abort-controller@2.0.14:
     resolution: {integrity: sha512-zXtteuYLWbSXnzI3O6xq3FYvigYZFW8mdytGibfarLL2lxHto9L3ILtGVnVGmFZa7SDh62l39EnU5hesLN87Fw==}

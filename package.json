@@ -61,8 +61,8 @@
     "@aws-sdk/client-sqs": "^3.54.0",
     "@aws-sdk/client-sts": "^3.254.0",
     "@aws-sdk/s3-request-presigner": "^3.420.0",
-    "@dashkite/joy": "link:../joy",
-    "@dashkite/media-type": "link:../media-type",
+    "@dashkite/joy": "^0.3.16",
+    "@dashkite/media-type": "^0.1.0",
     "js-yaml": "^4.1.0",
     "mime-types": "^2.1.35",
     "node-fetch": "^2.6.7"
