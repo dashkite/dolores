@@ -1,57 +1,30 @@
 import * as CloudWatch from "@aws-sdk/client-cloudwatch-logs"
-import { lift, partition } from "./helpers"
-import * as It from "@dashkite/joy/iterable"
+import { lift } from "./helpers"
+import * as Time from "@dashkite/joy/time"
 
 AWS =
   CloudWatch: lift CloudWatch
 
+getEvents = ({ start, end, group }) ->
+  loop
+    { events, nextToken } = await AWS.CloudWatch.filterLogEvents
+      logGroupName: group
+      startTime: start
+      endTime: end
+      nextToken: nextToken
+    yield event for event in events
+    break if !nextToken?
+
 tail = ( group ) ->
-  # TODO AWS SDK doesn't seem to accept LogGroupName ?!
-  streams = await AWS.CloudWatch.describeLogStreams
-    LogGroupName: group
-    Descending: true
-    Limit: 1
-    OrderBy: "LastEventTime"
-
-  console.log streams
-
-export { tail }
+  end = Date.now()
+  start = end - 30000 # 30 seconds
+  loop
+    yield event for await event from getEvents { start, end, group }
+    await Time.sleep 1000
+    start = end
+    end = Date.now()
   
 
 
-# try {
-#     const describeLogStreamsResponse = await cloudwatchlogs.describeLogStreams(params).promise();
 
-#     if (describeLogStreamsResponse.logStreams.length === 0) {
-#       console.log(`No log streams found for log group ${logGroupName}`);
-#       return;
-#     }
-
-#     const latestLogStreamName = describeLogStreamsResponse.logStreams[0].logStreamName;
-#     console.log(`Tailing logs from log stream: ${latestLogStreamName}`);
-
-#     // Start streaming logs
-#     const params = {
-#       logGroupName,
-#       logStreamName: latestLogStreamName,
-#       startFromHead: true
-#     };
-
-#     const logEvents = cloudwatchlogs.getLogEvents(params).createReadStream();
-
-#     logEvents.on('data', (event) => {
-#       const logEvent = JSON.parse(event.message);
-#       console.log(logEvent.message);
-#     });
-
-#     logEvents.on('error', (error) => {
-#       console.error(`Error reading log stream: ${error}`);
-#     });
-
-#     logEvents.on('end', () => {
-#       console.log('Log stream ended.');
-#     });
-#   } catch (err) {
-#     console.error(`Error describing log streams: ${err}`);
-#   }
-# }
+export { tail }
