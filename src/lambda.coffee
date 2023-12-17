@@ -108,6 +108,11 @@ publishLambda = (name, data, configuration) ->
     Timeout: timeout
     TracingConfig: Mode: "PassThrough"
     Role: role
+    # TODO change based on mode?
+    LoggingConfig:
+      LogFormat: "JSON"
+      ApplicationLogLevel: "TRACE"
+      SystemLogLevel: "DEBUG"
 
   if environment?
     _configuration.Environment = Variables: environment

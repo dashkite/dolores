@@ -5,23 +5,28 @@ import * as Time from "@dashkite/joy/time"
 AWS =
   CloudWatch: lift CloudWatch
 
+lag = 10000 # allow 10 seconds for logs to catch up
+
 getEvents = ({ start, end, group }) ->
   loop
     { events, nextToken } = await AWS.CloudWatch.filterLogEvents
       logGroupName: group
-      startTime: start
-      endTime: end
+      startTime: start - lag
+      endTime: end - lag
       nextToken: nextToken
     yield event for event in events
     break if !nextToken?
 
 tail = ( group ) ->
   end = Date.now()
-  start = end - 30000 # 30 seconds
+  start = end - lag
   loop
-    yield event for await event from getEvents { start, end, group }
+    for await event from getEvents { start, end, group }
+      yield event 
+      # [ start, end ] is an inclusive range
+      # so move start past end
+      start = end + 1
     await Time.sleep 1000
-    start = end
     end = Date.now()
   
 
