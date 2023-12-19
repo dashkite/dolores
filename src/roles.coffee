@@ -64,6 +64,7 @@ getRoleARN = (name) -> (await getRole name).arn
 
 export {
   createRole
+  deleteRole
   hasRole
   getRole
   getRoleARN
