@@ -42,13 +42,13 @@ createRole = ( name, policies, managedPolicies ) ->
         Type: "AWS::IAM::Role"
         Properties: properties
 
-  await deployStack name,
+  await deployStack "role-#{ name }",
     ( YAML.dump _template ),
     [ "CAPABILITY_NAMED_IAM" ]
 
   undefined
 
-deleteRole = (name) -> deleteStack name
+deleteRole = (name) -> deleteStack "role-#{ name }"
 
 hasRole = (name) -> (await getRole name)?
 
