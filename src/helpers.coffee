@@ -29,7 +29,7 @@ lift = (M, options) ->
     if key.endsWith "Command"
       name = key
         .replace /Command$/, ""
-        .replace /^[A-Z]/, (c) -> R.toLowerCase()
+        .replace /^[A-Z]/, (c) -> c.toLowerCase()
       N[ name ] = proxy value
       N[ "_#{ name }"] = metal value
     else if key.endsWith "Client"
