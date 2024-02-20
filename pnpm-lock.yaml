@@ -85,6 +85,9 @@ devDependencies:
   '@dashkite/genie':
     specifier: ^0.7.3
     version: 0.7.3
+  '@dashkite/genie-clean':
+    specifier: link:../genie-clean
+    version: link:../genie-clean
   '@dashkite/genie-coffee':
     specifier: link:../genie-coffee
     version: link:../genie-coffee
@@ -7063,7 +7066,7 @@ packages:
     dev: false
 
   /concat-map@0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
     dev: false
 
   /concat-stream@2.0.0:
