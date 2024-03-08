@@ -7,8 +7,19 @@ class HTTPError extends Error
 
 lift = (M, options) ->
 
+  clients = Object
+    .keys M
+    .filter ( key ) ->
+      ( key.endsWith "Client" ) && 
+        ( key != "__Client" )
+
+  if clients.length > 1
+    throw new Error "dolores: ambiguous lift condition:
+      more than one client: #{ clients.join ', '}"
+
   options ?= region: "us-east-1"
-  client = undefined
+
+  client = new M[ clients[0] ] options
 
   proxy = ( command ) -> 
     ( parameters = {} ) ->
@@ -32,8 +43,6 @@ lift = (M, options) ->
         .replace /^[A-Z]/, (c) -> c.toLowerCase()
       N[ name ] = proxy value
       N[ "_#{ name }"] = metal value
-    else if key.endsWith "Client"
-      client = new value options
   N
 
 turn = (nodes, state, context) ->

@@ -7,9 +7,7 @@ import * as Time from "@dashkite/joy/time"
 
 AWS =
   DynamoDB: lift DynamoDB
-
-region = "us-east-1"
-
+  
 wrap = generic name: "wrap"
 
 generic wrap, Type.isUndefined, -> NULL: true
