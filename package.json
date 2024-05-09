@@ -63,7 +63,7 @@
     "@aws-sdk/client-sts": "3.529.0",
     "@aws-sdk/s3-request-presigner": "3.529.0",
     "@dashkite/joy": "^0.3.16",
-    "@dashkite/media-type": "^0.1.0",
+    "@dashkite/media-type": "^0.1.1",
     "fast-xml-parser": "^4.3.5",
     "js-yaml": "^4.1.0",
     "mime-types": "^2.1.35",
