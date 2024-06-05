@@ -81,23 +81,20 @@ expressionAttributeNames = ( object ) ->
     result[ "##{key}" ] = key
   result
 
-getTable = (name) ->
+getTable = ( name ) ->
+  { Table } = await AWS.DynamoDB.describeTable TableName: name
+  Table
+
+hasTable = ( name ) ->
   try
-    { Table } = await AWS.DynamoDB.describeTable TableName: name
-    Table
+    await getTable name
+    true
   catch error
-    # for some reason, describe table returns a 400 for
-    # a resource not found 
+    # AWS seems to consider the table not existing as a 400 error :/
     if ( error.status == 404 ) || ( error.status == 400 )
-      null
+      false
     else
       throw error
-
-hasTable = (name) ->
-  if ( await getTable name )?
-    true
-  else
-    false
 
 getTableARN = (name) ->
   "arn:aws:dynamodb:*:*:table/#{name}"
