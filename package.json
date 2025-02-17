@@ -51,8 +51,10 @@
     "@aws-sdk/client-cloudwatch-logs": "3.529.0",
     "@aws-sdk/client-dynamodb": "3.529.0",
     "@aws-sdk/client-ec2": "3.529.0",
+    "@aws-sdk/client-ecr": "^3.670.0",
     "@aws-sdk/client-iam": "3.529.0",
     "@aws-sdk/client-lambda": "3.529.0",
+    "@aws-sdk/client-rds": "^3.682.0",
     "@aws-sdk/client-route-53": "3.529.0",
     "@aws-sdk/client-s3": "3.529.0",
     "@aws-sdk/client-secrets-manager": "3.529.0",
@@ -67,6 +69,7 @@
     "fast-xml-parser": "^4.3.5",
     "js-yaml": "^4.1.0",
     "mime-types": "^2.1.35",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "string-argv": "^0.3.2"
   }
 }
