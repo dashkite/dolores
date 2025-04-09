@@ -9,14 +9,12 @@ getTLD = ( domain ) -> (( domain.split "." )[-2..]).join "."
 
 getHostedZone = ( domain ) ->
   { HostedZones } = await AWS.Route53.listHostedZones MaxItems: "100"
-  for zone in HostedZones
-    if domain == zone.Name[..-2]
-      return
-        _: zone
-        id: zone.Id
-  undefined
+  zone = HostedZones.find ( zone ) -> 
+    # the subscript range removes the period-space at the end
+    domain == zone.Name[..-2]
+  if zone? then { _: zone, id: zone.Id }
 
-getHostedZoneID = (domain) -> ( await getHostedZone domain ).id
+getHostedZoneID = (domain) -> ( await getHostedZone domain )?.id
 
 addSubdomain = (domain, target) ->
   deployStack ( "domain-" + domain.replaceAll ".", "-" ),
