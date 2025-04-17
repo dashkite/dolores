@@ -8,8 +8,7 @@ AWS =
   S3: lift S3
 
 rescueNotFound = (error) ->
-  code = error.$metadata.httpStatusCode
-  if ! ( code in [ 403, 404 ] )
+  if ! ( error.status in [ 403, 404 ] )
     throw error
 
 hasBucket = (name) ->
