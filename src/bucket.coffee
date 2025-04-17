@@ -17,6 +17,7 @@ hasBucket = (name) ->
     await AWS.S3.headBucket Bucket: name
     true
   catch error
+    console.error error
     rescueNotFound error
     false
 
