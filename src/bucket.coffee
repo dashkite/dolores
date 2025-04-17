@@ -8,7 +8,7 @@ AWS =
   S3: lift S3
 
 rescueNotFound = (error) ->
-  code = error?.$response?.statusCode ? error.$metadata.httpStatusCode
+  code = error.$metadata.httpStatusCode
   if ! ( code in [ 403, 404 ] )
     throw error
 
@@ -49,6 +49,24 @@ putBucketPolicy = ( name, policy ) ->
 
 deleteBucketPolicy = ( name ) ->
   AWS.S3.deleteBucketPolicy Bucket: name
+
+removeBlocks = ( name ) ->
+  AWS.S3.putPublicAccessBlock
+    Bucket: name
+    PublicAccessBlockConfiguration:
+      BlockPublicAcls: false
+      IgnorePublicAcls: false
+      BlockPublicPolicy: false
+      RestrictPublicBuckets: false
+
+addBlocks = ( name ) ->
+  AWS.S3.putPublicAccessBlock
+    Bucket: name
+    PublicAccessBlockConfiguration:
+      BlockPublicAcls: true
+      IgnorePublicAcls: true
+      BlockPublicPolicy: true
+      RestrictPublicBuckets: true
 
 putBucketWebsite = ( name, { index, error }) ->
   AWS.S3.putBucketWebsite
@@ -169,6 +187,9 @@ export {
 
   putBucketPolicy
   deleteBucketPolicy
+
+  removeBlocks
+  addBlocks
 
   putBucketWebsite
   putBucketRedirect

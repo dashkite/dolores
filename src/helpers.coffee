@@ -1,11 +1,40 @@
+class HTTPError extends Error
+  constructor: ( error ) ->
+    status = error.$metadata.httpStatusCode
+    super "HTTP Error: #{ status }. #{ error.message }"
+    @_ = error
+    @status = status
+
 lift = (M, options) ->
 
+  clients = Object
+    .keys M
+    .filter ( key ) ->
+      ( key.endsWith "Client" ) && 
+        ( key != "__Client" )
+
+  if clients.length > 1
+    throw new Error "dolores: ambiguous lift condition:
+      more than one client: #{ clients.join ', '}"
+
   options ?= region: "us-east-1"
-  client = undefined
+
+  client = new M[ clients[0] ] options
 
   proxy = ( command ) -> 
-    ( parameters = {} ) -> client.send new command parameters
-
+    ( parameters = {} ) ->
+      try
+        await client.send new command parameters
+      catch error
+        if error.$metadata?.httpStatusCode?
+          throw new HTTPError error
+        else
+          throw error
+  
+  metal = ( command ) ->
+    ( parameters = {} ) ->
+      client.send new command parameters
+  
   N = {}
   for key, value of M
     if key.endsWith "Command"
@@ -13,8 +42,7 @@ lift = (M, options) ->
         .replace /Command$/, ""
         .replace /^[A-Z]/, (c) -> c.toLowerCase()
       N[ name ] = proxy value
-    else if key.endsWith "Client"
-      client = new value options
+      N[ "_#{ name }"] = metal value
   N
 
 turn = (nodes, state, context) ->
@@ -27,7 +55,7 @@ turn = (nodes, state, context) ->
       else if node.next?
         original = state.name
         state.name = await node.next context, state
-        console.log "#{original} -> #{state.name}"
+        # console.log "#{original} -> #{state.name}"
         if node.nodes?
           try
             await turn node.nodes, state, context
