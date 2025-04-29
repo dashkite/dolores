@@ -17,7 +17,6 @@ hasLambda = (name) ->
     await getLambda name
     true
   catch error
-    # TODO we should probably also check for an HTTPError instance
     if error.status == 404
       false
     else
@@ -108,7 +107,6 @@ publishLambda = (name, data, configuration) ->
     Timeout: timeout
     TracingConfig: Mode: "PassThrough"
     Role: role
-    # TODO change based on mode?
     LoggingConfig:
       LogFormat: "JSON"
       ApplicationLogLevel: "TRACE"
@@ -158,7 +156,6 @@ listVersions = ( name ) ->
       yield version
     if NextToken? then continue else return
 
-# TODO prune oldest N versions (using listVersions async iterator)
 
 versionLambda = (name) ->
   result = await AWS.Lambda.publishVersion FunctionName: name
@@ -188,7 +185,6 @@ hasFunctionURL = ( name ) ->
     await getFunctionURL name
     true
   catch error
-    # TODO we should probably also check for an HTTPError instance
     if error.status == 404
       false
     else

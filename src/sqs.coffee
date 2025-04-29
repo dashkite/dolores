@@ -122,7 +122,6 @@ popMessages = (name, options) ->
   else
     throw new Error "dolores:queue: the queue #{name} is not available"
 
-# TODO: handle the batch versions of these operations...
 
 
 # this is sort of an emerging alternative API for this
@@ -134,19 +133,6 @@ create = ( name ) ->
     QueueName: name
     # allow SNS to send messages by default
 
-    # TODO AWS recommends specifying the topic
-    # Ex:
-    #   Condition:
-    #     ArnLike:
-    #       "aws:SourceArn": "arn:aws:sns:..."
-    # but that would require:
-    # - getting the queue attributes
-    # - adding a policy for the topic
-    # - updating the queue attributes
-    # on each subscription.
-    # Not sure it's worth it, given that the
-    # publish request must already be from
-    # AWS (due the Principal constraint).
 
     Attributes:
       SqsManagedSseEnabled: "false"

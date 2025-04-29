@@ -10,7 +10,6 @@ hasStack = (name) -> (await getStack name)?
 getStack = (name) ->
   try
     { Stacks } = await AWS.CloudFormation.describeStacks StackName: name
-    # TODO is there anything else to return here?
     status: Stacks[0]?.StackStatus
     _: Stacks[0]
   catch

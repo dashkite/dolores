@@ -12,8 +12,6 @@ AWS =
 
 createStepFunction = ({ name, dictionary, resources, description }) ->
   account = ( await AWS.STS.getCallerIdentity() ).Account
-  # TODO make the region dynamic?
-  arn = "arn:aws:states:us-east-1:#{account}:stateMachine:#{name}"
   _template =
     AWSTemplateFormatVersion: "2010-09-09"
     Description: "Create step function [ #{name} ]"

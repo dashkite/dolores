@@ -34,23 +34,6 @@ addSubdomain = (domain, target) ->
               HostedZoneId: "Z2FDTNDATAQYW2"
           ]
 
-  # TODO I couldn't get this to work
-  # but this would probably run much faster?
-  # kept getting invalid input errors
-  # AWS.Route53.changeResourceRecordSets
-  #   HostedZoneId: await getHostedZoneID getTLD domain
-  #   ChangeBatch:
-  #     Changes: [
-  #       Action: "UPSERT"
-  #       ResourceRecordSet:
-  #         Name: "#{ domain }."
-  #         Type: "A"
-  #         TTL: 300
-  #         AliasTarget:
-  #           DNSName: "#{ target }."
-  #           EvaluateTargetHealth: false
-  #           HostedZoneId: "Z2FDTNDATAQYW2"
-  #     ]
 
 export {
   getHostedZone

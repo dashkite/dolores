@@ -35,8 +35,6 @@ __getSecret = (_name) ->
     secret.SecretString = bundle?[subName]
   secret
 
-# TODO replace this primitive expiry mechanism with a means to message lambdas?
-# and/or we can use worker message queues...
 _getSecret = (name) ->
   if !( secret = secrets[name] )? || ( Date.now() > secret.expires )
     secret =

@@ -120,7 +120,6 @@ deleteObjects = (name, keys) ->
       Objects: ( Key: key for key in keys )
       Quiet: true
 
-# TODO return an async iterator
 listObjects = (name, prefix, items=[], token) ->
   parameters = 
     Bucket: name

@@ -4,12 +4,6 @@ AWS =
   ACM: new ACM region: "us-east-1"
 
 
-# TODO search by tags should probably be a standard feature
-# { Tags } = await AWS.ACM.listTagsForCertificate { CertificateArn }
-# for Tag in Tags
-#   if Tag.Key == "Name" && Tag.Value == name
-#     return 
-#       arn: CertificateArn
 
 hasCertificate = (name) -> (await getCertification domain)?
 

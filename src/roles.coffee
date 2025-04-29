@@ -7,8 +7,6 @@ AWS =
   IAM: new IAM region: "us-east-1"
 
 createRole = ( name, policies, managedPolicies ) ->
-  # TODO possibly use API directly for creating roles
-  # so we don't exhaust our stack quota
   properties = 
     RoleName: name
     AssumeRolePolicyDocument:
@@ -53,8 +51,6 @@ deleteRole = (name) -> deleteStack "role-#{ name }"
 hasRole = (name) -> (await getRole name)?
 
 getRole = (name) ->
-  # TODO handle not found explicitly
-  # see lambda for example but unsure if the exception is always the same
   try
     { Role } = await AWS.IAM.getRole RoleName: name
     arn: Role.Arn

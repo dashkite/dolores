@@ -2,11 +2,8 @@ import YAML from "js-yaml"
 
 import { deployStack, deleteStack } from "./stack"
 
-# TODO support patterns
 
 createRule = ({ name, target, schedule }) ->
-  # TODO possibly use API directly for creating rules
-  # so we don't exhaust our stack quota
   _template =
     AWSTemplateFormatVersion: "2010-09-09"
     Description: "Create rule [ #{name} ]"
