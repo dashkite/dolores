@@ -9,55 +9,55 @@ importers:
   .:
     dependencies:
       '@aws-sdk/client-acm':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-cloudformation':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-cloudfront':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-cloudwatch-logs':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-dynamodb':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-ec2':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-iam':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-lambda':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-route-53':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-s3':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-secrets-manager':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-ses':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-sfn':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-sns':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-sqs':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@aws-sdk/client-sts':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0(@aws-sdk/credential-provider-node@3.529.0)
       '@aws-sdk/s3-request-presigner':
-        specifier: 3.529.0
+        specifier: ^3.529.0
         version: 3.529.0
       '@dashkite/joy':
         specifier: ^0.7.0
@@ -75,7 +75,7 @@ importers:
         specifier: ^2.1.35
         version: 2.1.35
       node-fetch:
-        specifier: ^2.6.7
+        specifier: ^2.7.0
         version: 2.7.0
     devDependencies:
       '@dashkite/amen':
@@ -91,16 +91,16 @@ importers:
         specifier: ^0.20.4
         version: 0.20.4
       '@dashkite/genie-clean':
-        specifier: 0.9.0
+        specifier: ^0.9.0
         version: 0.9.0
       '@dashkite/genie-coffee':
-        specifier: 0.9.0
+        specifier: ^0.9.0
         version: 0.9.0
       '@dashkite/genie-release':
         specifier: ^0.3.0
         version: 0.3.0
       '@dashkite/genie-yaml':
-        specifier: 0.7.0
+        specifier: ^0.7.0
         version: 0.7.0
 
 packages:
