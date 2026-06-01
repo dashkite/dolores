@@ -1,6 +1,6 @@
 {
   "name": "@dashkite/dolores",
-  "version": "0.12.25",
+  "version": "0.12.26",
   "description": "AWS Utility Functions For Use With Studio",
   "exports": {
     "./*": {
