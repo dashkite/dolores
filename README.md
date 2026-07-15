@@ -1,60 +1,41 @@
 # Dolores
 
-[![Hippocratic License HL3-CORE](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-CORE&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/core.html)
-
 _AWS utility functions for use with Studio_
 
-## API
+[![Hippocratic License HL3-CORE](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-CORE&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/core.html)
 
-### ACM
+Dolores is a collection of AWS utility functions specifically designed for use with DashKite Studio. It provides a simplified interface for interacting with AWS services including ACM, CloudFront, CloudWatch, DynamoDB, Lambda, Route53, S3, Secrets Manager, SES, SNS, SQS, Stacks, Step Functions, and VPC.
 
-#### hasCertificate
+## Features
 
-_hasCertificate domain ⇢ boolean_
+- Provides simplified API wrappers around AWS SDK v3 client libraries.
+- Automates and integrates common provisioning and deployment patterns via `deployStack`.
+- Focuses on operational and structural needs for DashKite Studio.
+- Utilizes functional composition patterns for asynchronous workflows.
 
-#### getCerticate
+## Installation
 
-_hasCertificate domain ⇢ certificate-description_
+```bash
+pnpm install @dashkite/dolores
+```
 
-### Route53
+## Usage
 
-#### getHostedZone
+Dolores exposes utility functions grouped by AWS service. You can import specific utilities and use them to interact with your AWS environment.
 
-_getHostedZone domain ⇢ zone-description_
+```coffeescript
+import { hasCertificate, getCertificate } from "@dashkite/dolores/acm"
 
-### Lambda
+# Check if a certificate exists for a domain
+exists = await hasCertificate "example.com"
 
-#### hasLambda
+# Retrieve the certificate details
+cert = await getCertificate "example.com"
+```
 
-#### getLambda
+## Other Resources
 
-#### getLambdaVersion
-
-#### getLambdaLatest
-
-#### publishLambda
-
-#### versionLambda
-
-### Stacks
-
-#### hasStack
-
-#### getStack
-
-#### deployStack
-
-### Secrets
-
-#### hasSecret
-
-_hasSecret name ⇢ boolean_
-
-#### getSecret
-
-_getSecret name ⇢ value_
-
-#### setSecret
-
-_setSecret name, value_
-
+- [Reference Documentation](docs/reference.md)
+- [Recipes](docs/recipes.md)
+- [Technical Notes](docs/technical-notes.md)
+- [Testing](docs/testing.md)
